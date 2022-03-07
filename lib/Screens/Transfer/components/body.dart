@@ -29,12 +29,12 @@ class FormScreenState extends State<Body> {
         if (value.isEmpty) {
           return 'Phone Number is Required';
         } else {
-          SenderPhoneNumber = value;
+          ReceiverPhoneNumber = value;
         }
         return null;
       },
       onSaved: (String value) {
-        SenderPhoneNumber = value;
+        ReceiverPhoneNumber = value;
       },
     );
   }
@@ -55,7 +55,7 @@ class FormScreenState extends State<Body> {
         return null;
       },
       onSaved: (String value) {
-        ReceiverPhoneNumber = value;
+        SenderPhoneNumber = value;
       },
     );
   }
@@ -130,20 +130,24 @@ class FormScreenState extends State<Body> {
 
                     _formKey.currentState.save();
 
-                    DatabaseReference ref =
-                        FirebaseDatabase.instance.ref().child("Users");
-                    ref.child(SenderPhoneNumber);
+                    DatabaseReference ref = FirebaseDatabase.instance
+                        .ref()
+                        .child("Users/" + SenderPhoneNumber);
 
                     DatabaseEvent event = await ref.once();
                     // print(event.snapshot.value);
                     Map<dynamic, dynamic> map = event.snapshot.value;
-                    int senderamount =
-                        int.parse(map.values.toList()[0]["balance"]);
+                    print(event.snapshot.value);
+                    int senderamount = int.parse(map.values.toList()[1]);
 
-                    ref.parent.child(ReceiverPhoneNumber);
+                    ref = FirebaseDatabase.instance
+                        .ref()
+                        .child("Users/" + ReceiverPhoneNumber);
 
-                    int receiveramount =
-                        int.parse(map.values.toList()[0]["balance"]);
+                    event = await ref.once();
+                    map = event.snapshot.value;
+
+                    int receiveramount = int.parse(map.values.toList()[1]);
 
                     int senderamountremaining =
                         senderamount - int.parse(_Amount);
@@ -156,7 +160,11 @@ class FormScreenState extends State<Body> {
                       "balance": receiveramountremaining,
                     });
 
-                    ref.parent.child(SenderPhoneNumber);
+                    ref = FirebaseDatabase.instance
+                        .ref()
+                        .child("Users/" + SenderPhoneNumber);
+                    event = await ref.once();
+                    map = event.snapshot.value;
                     await ref.update({
                       "balance": senderamountremaining,
                     });

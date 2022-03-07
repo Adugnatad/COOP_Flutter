@@ -54,13 +54,12 @@ class Body extends StatelessWidget {
               text: "LOGIN",
               press: () async {
                 DatabaseReference ref =
-                    FirebaseDatabase.instance.ref().child("Users");
-                ref.child(username);
+                    FirebaseDatabase.instance.ref().child("Users/" + username);
 
                 DatabaseEvent event = await ref.once();
                 print(event.snapshot.value);
                 Map<dynamic, dynamic> map = event.snapshot.value;
-                String passwordReturned = map.values.toList()[0]["password"];
+                String passwordReturned = (map.values.toList()[0]).toString();
                 print(passwordReturned);
 
                 if (password == passwordReturned) {
