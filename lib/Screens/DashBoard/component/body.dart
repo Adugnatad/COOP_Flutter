@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/Transfer/balanceScreen.dart';
+import 'package:flutter_auth/Screens/AirTime/airtimeScreen.dart';
 import 'package:flutter_auth/Screens/Profile/profileScreen.dart';
 
 class MakeDashboardItems extends StatefulWidget {
@@ -56,7 +57,14 @@ class _MakeDashboardItemsState extends State<MakeDashboardItems> {
               );
             }
             if (index == 2) {
-              //3.item
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return AirtimeScreen();
+                  },
+                ),
+              );
             }
           },
           child: Column(

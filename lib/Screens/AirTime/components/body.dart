@@ -11,38 +11,16 @@ class Body extends StatefulWidget {
 }
 
 class FormScreenState extends State<Body> {
-  String SenderPhoneNumber;
-  String ReceiverPhoneNumber;
+  String BuyerPhoneNumber;
   String _Amount;
   String _password;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  Widget _buildPhoneNumber() {
-    return TextFormField(
-      decoration: InputDecoration(
-        labelText: 'Receiver Phone NO',
-        fillColor: kPrimaryColor,
-      ),
-      maxLength: 10,
-      validator: (String value) {
-        if (value.isEmpty) {
-          return 'Phone Number is Required';
-        } else {
-          ReceiverPhoneNumber = value;
-        }
-        return null;
-      },
-      onSaved: (String value) {
-        ReceiverPhoneNumber = value;
-      },
-    );
-  }
-
   Widget _buildPhoneNumber2() {
     return TextFormField(
       decoration: InputDecoration(
-        labelText: 'Sender Phone NO',
+        labelText: 'To Phone NO',
         fillColor: kPrimaryColor,
       ),
       maxLength: 10,
@@ -50,12 +28,12 @@ class FormScreenState extends State<Body> {
         if (value.isEmpty) {
           return 'Phone Number is Required';
         } else {
-          SenderPhoneNumber = value;
+          BuyerPhoneNumber = value;
         }
         return null;
       },
       onSaved: (String value) {
-        SenderPhoneNumber = value;
+        BuyerPhoneNumber = value;
       },
     );
   }
@@ -104,7 +82,7 @@ class FormScreenState extends State<Body> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Transfer Money")),
+      appBar: AppBar(title: Text("Buy Airtime")),
       body: SingleChildScrollView(
         child: Container(
           margin: EdgeInsets.all(15),
@@ -114,13 +92,12 @@ class FormScreenState extends State<Body> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 _buildPhoneNumber2(),
-                _buildPhoneNumber(),
                 _buildAmount(),
                 _buildPassword(),
                 SizedBox(height: 50),
                 ElevatedButton(
                   child: Text(
-                    'Transfer',
+                    'BUY',
                     style: TextStyle(color: Colors.white, fontSize: 16),
                   ),
                   onPressed: () async {
@@ -132,42 +109,21 @@ class FormScreenState extends State<Body> {
 
                     DatabaseReference ref = FirebaseDatabase.instance
                         .ref()
-                        .child("Users/" + SenderPhoneNumber);
+                        .child("Users/" + BuyerPhoneNumber);
 
                     DatabaseEvent event = await ref.once();
                     // print(event.snapshot.value);
                     Map<dynamic, dynamic> map = event.snapshot.value;
                     print(event.snapshot.value);
-                    int senderamount = map.values.toList()[1];
+                    int buyerbalance = map.values.toList()[1];
 
-                    ref = FirebaseDatabase.instance
-                        .ref()
-                        .child("Users/" + ReceiverPhoneNumber);
-
-                    event = await ref.once();
-                    map = event.snapshot.value;
-
-                    int receiveramount = map.values.toList()[1];
-
-                    int senderamountremaining =
-                        senderamount - int.parse(_Amount);
-
-                    int receiveramountremaining =
-                        receiveramount + int.parse(_Amount);
-                    //calculations
+                    int newBuyerBalance = buyerbalance - int.parse(_Amount);
 
                     await ref.update({
-                      "balance": receiveramountremaining,
+                      "balance": newBuyerBalance,
                     });
 
-                    ref = FirebaseDatabase.instance
-                        .ref()
-                        .child("Users/" + SenderPhoneNumber);
-                    await ref.update({
-                      "balance": senderamountremaining,
-                    });
-
-                    print(SenderPhoneNumber);
+                    print(BuyerPhoneNumber);
                     print(_Amount);
                     print(_password);
                   },
