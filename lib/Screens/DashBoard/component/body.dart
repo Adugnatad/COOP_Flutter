@@ -2,30 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/Transfer/balanceScreen.dart';
 import 'package:flutter_auth/Screens/AirTime/airtimeScreen.dart';
 import 'package:flutter_auth/Screens/Profile/profileScreen.dart';
+import 'package:flutter_auth/icons.dart';
 
 class MakeDashboardItems extends StatefulWidget {
   // const MakeDashboardItems({Key? key}) : super(key: key);
+  final String username;
+  MakeDashboardItems(this.username);
 
   @override
-  _MakeDashboardItemsState createState() => _MakeDashboardItemsState();
+  _MakeDashboardItemsState createState() => _MakeDashboardItemsState(username);
 }
 
 class _MakeDashboardItemsState extends State<MakeDashboardItems> {
-  Card makeDashboardItem(String title, String img, int index) {
+  final String username;
+  _MakeDashboardItemsState(this.username);
+
+  Card makeDashboardItem(String title, int index, Widget widget) {
     return Card(
       elevation: 2,
       margin: const EdgeInsets.all(8),
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5),
-          gradient: const LinearGradient(
-            begin: FractionalOffset(0.0, 0.0),
-            end: FractionalOffset(3.0, -1.0),
-            colors: [
-              Color(0xFF004B8D),
-              Color(0xFFffffff),
-            ],
-          ),
+          color: Color.fromRGBO(0, 173, 239, 1),
           boxShadow: const [
             BoxShadow(
               color: Colors.white,
@@ -41,7 +40,7 @@ class _MakeDashboardItemsState extends State<MakeDashboardItems> {
                 context,
                 MaterialPageRoute(
                   builder: (context) {
-                    return BalanceScreen();
+                    return BalanceScreen(username);
                   },
                 ),
               );
@@ -51,7 +50,7 @@ class _MakeDashboardItemsState extends State<MakeDashboardItems> {
                 context,
                 MaterialPageRoute(
                   builder: (context) {
-                    return profileScreen();
+                    return profileScreen(username);
                   },
                 ),
               );
@@ -61,7 +60,7 @@ class _MakeDashboardItemsState extends State<MakeDashboardItems> {
                 context,
                 MaterialPageRoute(
                   builder: (context) {
-                    return AirtimeScreen();
+                    return AirtimeScreen(username);
                   },
                 ),
               );
@@ -69,16 +68,10 @@ class _MakeDashboardItemsState extends State<MakeDashboardItems> {
           },
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisSize: MainAxisSize.min,
+            mainAxisSize: MainAxisSize.max,
             children: [
               const SizedBox(height: 10),
-              Center(
-                child: Image.asset(
-                  img,
-                  height: 50,
-                  width: 50,
-                ),
-              ),
+              Center(child: widget),
               const SizedBox(height: 20),
               Center(
                 child: Text(
@@ -97,10 +90,34 @@ class _MakeDashboardItemsState extends State<MakeDashboardItems> {
     );
   }
 
+  Widget _buildbalanceIcon() {
+    return Icon(
+      MyFlutterApp.balance,
+      size: 60,
+      color: Colors.white,
+    );
+  }
+
+  Widget _buildmoneyIcon() {
+    return Icon(
+      MyFlutterApp.money_transfer,
+      size: 70,
+      color: Colors.white,
+    );
+  }
+
+  Widget _buildairtimeIcon() {
+    return Icon(
+      MyFlutterApp.airtime,
+      size: 60,
+      color: Colors.white,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 170, 193, 232),
+      backgroundColor: Color.fromRGBO(0, 173, 239, .3),
       body: Column(
         children: [
           const SizedBox(height: 50),
@@ -112,13 +129,12 @@ class _MakeDashboardItemsState extends State<MakeDashboardItems> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: const <Widget>[
-                    Text(
-                      "Thank you for banking with us",
-                      style: TextStyle(
+                    Text("Thank you for banking with us",
+                        style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Colors.blue),
-                    ),
+                          color: Color.fromRGBO(0, 173, 239, 1),
+                        )),
                     SizedBox(height: 4),
                   ],
                 ),
@@ -126,10 +142,9 @@ class _MakeDashboardItemsState extends State<MakeDashboardItems> {
             ),
           ),
           const SizedBox(height: 20),
-          makeDashboardItem(
-              "Transfer Money", "assets/images/bank-transfer.png", 0),
-          makeDashboardItem("View Balance", "assets/images/account.png", 1),
-          makeDashboardItem("Buy Airtime", "assets/images/chat.png", 2),
+          makeDashboardItem("Transfer Money", 0, _buildmoneyIcon()),
+          makeDashboardItem("View Balance", 1, _buildbalanceIcon()),
+          makeDashboardItem("Buy Airtime", 2, _buildairtimeIcon()),
         ],
       ),
     );

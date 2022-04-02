@@ -4,6 +4,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 class Body extends StatelessWidget {
+  final String username;
   String AccountNumber;
   String Balance;
   String PhoneNumber;
@@ -11,10 +12,9 @@ class Body extends StatelessWidget {
   final _phoneController = TextEditingController();
   final _balanceController = TextEditingController();
 
-  DatabaseReference ref =
-      FirebaseDatabase.instance.ref().child("Users/" + "0942177936");
-
   void getData() async {
+    DatabaseReference ref =
+        FirebaseDatabase.instance.ref().child("Users/" + username);
     DatabaseEvent event = await ref.once();
     print(event.snapshot.value);
     Map<dynamic, dynamic> map = event.snapshot.value;
@@ -23,12 +23,12 @@ class Body extends StatelessWidget {
     PhoneNumber = (map.values.toList()[3]).toString();
     _accountController.text = AccountNumber;
     _phoneController.text = PhoneNumber;
-    _balanceController.text = Balance;
+    _balanceController.text = Balance + " ETB";
     // Balance = (map.values.toList()[0]).toString();
     // PhoneNumber = (map.values.toList()[0]).toString();
   }
 
-  Body() {
+  Body(this.username) {
     getData();
   }
 
@@ -44,7 +44,7 @@ class Body extends StatelessWidget {
           borderSide: new BorderSide(),
         ),
       ),
-      maxLength: 12,
+      maxLength: 20,
       validator: (String value) {
         // value = "hello";
         return null;
@@ -54,7 +54,7 @@ class Body extends StatelessWidget {
 
   Widget _buildBalance() {
     return TextFormField(
-      controller: _phoneController,
+      controller: _balanceController,
       enabled: false,
       decoration: InputDecoration(
         labelText: "Balance",
@@ -95,6 +95,7 @@ class Body extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromRGBO(0, 173, 239, .3),
       appBar: AppBar(title: Text("User Profile")),
       body: Stack(
         alignment: Alignment.center,

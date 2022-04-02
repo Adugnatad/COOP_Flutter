@@ -2,15 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_auth/constants.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class Body extends StatefulWidget {
+  final String username;
+  Body(this.username);
   @override
   State<StatefulWidget> createState() {
-    return FormScreenState();
+    return FormScreenState(username);
   }
 }
 
 class FormScreenState extends State<Body> {
+  final String username;
+  final TextEditingController phone = new TextEditingController();
+  final TextEditingController amount = new TextEditingController();
+  final TextEditingController password = new TextEditingController();
+  FormScreenState(this.username);
   String BuyerPhoneNumber;
   String _Amount;
   String _password;
@@ -19,6 +27,7 @@ class FormScreenState extends State<Body> {
 
   Widget _buildPhoneNumber2() {
     return TextFormField(
+      controller: phone,
       decoration: InputDecoration(
         labelText: 'To Phone NO',
         fillColor: kPrimaryColor,
@@ -40,6 +49,7 @@ class FormScreenState extends State<Body> {
 
   Widget _buildAmount() {
     return TextFormField(
+      controller: amount,
       decoration: InputDecoration(labelText: 'Amount'),
       validator: (String value) {
         if (value.isEmpty) {
@@ -62,6 +72,7 @@ class FormScreenState extends State<Body> {
 
   Widget _buildPassword() {
     return TextFormField(
+      controller: password,
       decoration: InputDecoration(labelText: 'PIN Code'),
       keyboardType: TextInputType.visiblePassword,
       validator: (String value) {
@@ -82,6 +93,7 @@ class FormScreenState extends State<Body> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromRGBO(0, 173, 239, .3),
       appBar: AppBar(title: Text("Buy Airtime")),
       body: SingleChildScrollView(
         child: Container(
@@ -109,23 +121,41 @@ class FormScreenState extends State<Body> {
 
                     DatabaseReference ref = FirebaseDatabase.instance
                         .ref()
-                        .child("Users/" + BuyerPhoneNumber);
+                        .child("Users/" + username);
 
                     DatabaseEvent event = await ref.once();
                     // print(event.snapshot.value);
                     Map<dynamic, dynamic> map = event.snapshot.value;
-                    print(event.snapshot.value);
-                    int buyerbalance = map.values.toList()[1];
 
-                    int newBuyerBalance = buyerbalance - int.parse(_Amount);
+                    String senderPassword = (map.values.toList()[0]).toString();
 
-                    await ref.update({
-                      "balance": newBuyerBalance,
-                    });
+                    if (_password == senderPassword) {
+                      print(event.snapshot.value);
+                      int senderbalance =
+                          map.values.toList()[1] - int.parse(_Amount);
 
-                    print(BuyerPhoneNumber);
-                    print(_Amount);
-                    print(_password);
+                      await ref.update({
+                        "balance": senderbalance,
+                      });
+                      setState(() {
+                        phone.text = "";
+                        amount.text = "";
+                        password.text = "";
+                      });
+                      Fluttertoast.showToast(
+                          msg: 'Successful',
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.BOTTOM,
+                          backgroundColor: Color.fromARGB(255, 255, 255, 255),
+                          textColor: Color.fromARGB(255, 46, 139, 77));
+                    } else {
+                      Fluttertoast.showToast(
+                          msg: 'Incorrect Password',
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.BOTTOM,
+                          backgroundColor: Colors.blue,
+                          textColor: Colors.orange);
+                    }
                   },
                 )
               ],

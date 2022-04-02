@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_auth/Screens/Login/components/background.dart';
+import 'package:flutter_auth/Screens/background.dart';
 import 'package:flutter_auth/Screens/Signup/signup_screen.dart';
-import 'package:flutter_auth/Screens/Transfer/balanceScreen.dart';
+// import 'package:flutter_auth/Screens/Transfer/balanceScreen.dart';
 import 'package:flutter_auth/Screens/DashBoard/Data/dashboardScreen.dart';
 import 'package:flutter_auth/components/already_have_an_account_acheck.dart';
 import 'package:flutter_auth/components/rounded_button.dart';
@@ -19,22 +19,29 @@ class Body extends StatelessWidget {
     Key key,
   }) : super(key: key);
 
+  void onChanged(value) {
+    password = value;
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     Firebase.initializeApp();
     return Background(
+      Colo: Color.fromRGBO(0, 173, 239, .3),
       child: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
               "LOGIN",
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: size.height * 0.03),
             SvgPicture.asset(
               "assets/icons/login.svg",
+              color: Color.fromRGBO(0, 173, 239, 1),
               height: size.height * 0.35,
             ),
             SizedBox(height: size.height * 0.03),
@@ -45,11 +52,7 @@ class Body extends StatelessWidget {
                 username = value;
               },
             ),
-            RoundedPasswordField(
-              onChanged: (value) {
-                password = value;
-              },
-            ),
+            RoundedPasswordField(onChanged),
             RoundedButton(
               text: "LOGIN",
               press: () async {
@@ -68,13 +71,13 @@ class Body extends StatelessWidget {
                     MaterialPageRoute(
                       builder: (context) {
                         // return BalanceScreen();
-                        return DashScreen();
+                        return DashScreen(username);
                       },
                     ),
                   );
                 } else {
                   Fluttertoast.showToast(
-                      msg: 'This is toast notification',
+                      msg: 'Incorrect Password',
                       toastLength: Toast.LENGTH_SHORT,
                       gravity: ToastGravity.BOTTOM,
                       backgroundColor: Colors.blue,

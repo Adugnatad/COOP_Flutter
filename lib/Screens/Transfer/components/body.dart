@@ -1,17 +1,27 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/constants.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class Body extends StatefulWidget {
+  final String username;
+
+  Body(this.username);
   @override
   State<StatefulWidget> createState() {
-    return FormScreenState();
+    return FormScreenState(username);
   }
 }
 
 class FormScreenState extends State<Body> {
-  String SenderPhoneNumber;
+  final String username;
+  final TextEditingController phone = new TextEditingController();
+  final TextEditingController amount = new TextEditingController();
+  final TextEditingController password = new TextEditingController();
+  FormScreenState(this.username);
   String ReceiverPhoneNumber;
   String _Amount;
   String _password;
@@ -20,6 +30,7 @@ class FormScreenState extends State<Body> {
 
   Widget _buildPhoneNumber() {
     return TextFormField(
+      controller: phone,
       decoration: InputDecoration(
         labelText: 'Receiver Phone NO',
         fillColor: kPrimaryColor,
@@ -39,29 +50,9 @@ class FormScreenState extends State<Body> {
     );
   }
 
-  Widget _buildPhoneNumber2() {
-    return TextFormField(
-      decoration: InputDecoration(
-        labelText: 'Sender Phone NO',
-        fillColor: kPrimaryColor,
-      ),
-      maxLength: 10,
-      validator: (String value) {
-        if (value.isEmpty) {
-          return 'Phone Number is Required';
-        } else {
-          SenderPhoneNumber = value;
-        }
-        return null;
-      },
-      onSaved: (String value) {
-        SenderPhoneNumber = value;
-      },
-    );
-  }
-
   Widget _buildAmount() {
     return TextFormField(
+      controller: amount,
       decoration: InputDecoration(labelText: 'Amount'),
       validator: (String value) {
         if (value.isEmpty) {
@@ -84,6 +75,7 @@ class FormScreenState extends State<Body> {
 
   Widget _buildPassword() {
     return TextFormField(
+      controller: password,
       decoration: InputDecoration(labelText: 'PIN Code'),
       keyboardType: TextInputType.visiblePassword,
       validator: (String value) {
@@ -104,6 +96,7 @@ class FormScreenState extends State<Body> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromRGBO(0, 173, 239, .3),
       appBar: AppBar(title: Text("Transfer Money")),
       body: SingleChildScrollView(
         child: Container(
@@ -113,7 +106,6 @@ class FormScreenState extends State<Body> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                _buildPhoneNumber2(),
                 _buildPhoneNumber(),
                 _buildAmount(),
                 _buildPassword(),
@@ -132,46 +124,67 @@ class FormScreenState extends State<Body> {
 
                     DatabaseReference ref = FirebaseDatabase.instance
                         .ref()
-                        .child("Users/" + SenderPhoneNumber);
+                        .child("Users/" + username);
 
                     DatabaseEvent event = await ref.once();
                     // print(event.snapshot.value);
                     Map<dynamic, dynamic> map = event.snapshot.value;
                     print(event.snapshot.value);
                     int senderamount = map.values.toList()[1];
+                    String senderPassword = (map.values.toList()[0]).toString();
 
-                    ref = FirebaseDatabase.instance
-                        .ref()
-                        .child("Users/" + ReceiverPhoneNumber);
+                    if (_password == senderPassword) {
+                      ref = FirebaseDatabase.instance
+                          .ref()
+                          .child("Users/" + ReceiverPhoneNumber);
 
-                    event = await ref.once();
-                    map = event.snapshot.value;
+                      event = await ref.once();
+                      map = event.snapshot.value;
 
-                    int receiveramount = map.values.toList()[1];
+                      int receiveramount = map.values.toList()[1];
 
-                    int senderamountremaining =
-                        senderamount - int.parse(_Amount);
+                      int senderamountremaining =
+                          senderamount - int.parse(_Amount);
 
-                    int receiveramountremaining =
-                        receiveramount + int.parse(_Amount);
-                    //calculations
+                      int receiveramountremaining =
+                          receiveramount + int.parse(_Amount);
+                      //calculations
 
-                    await ref.update({
-                      "balance": receiveramountremaining,
-                    });
+                      await ref.update({
+                        "balance": receiveramountremaining,
+                      });
 
-                    ref = FirebaseDatabase.instance
-                        .ref()
-                        .child("Users/" + SenderPhoneNumber);
-                    await ref.update({
-                      "balance": senderamountremaining,
-                    });
+                      ref = FirebaseDatabase.instance
+                          .ref()
+                          .child("Users/" + username);
+                      await ref.update({
+                        "balance": senderamountremaining,
+                      });
+                      setState(() {
+                        phone.text = "";
+                        amount.text = "";
+                        password.text = "";
+                      });
+                      Fluttertoast.showToast(
+                          msg: 'Successful',
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.BOTTOM,
+                          backgroundColor: Color.fromARGB(255, 255, 255, 255),
+                          textColor: Color.fromARGB(255, 46, 139, 77));
+                    } else {
+                      Fluttertoast.showToast(
+                          msg: 'Incorrect Password',
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.BOTTOM,
+                          backgroundColor: Colors.blue,
+                          textColor: Colors.orange);
+                    }
 
-                    print(SenderPhoneNumber);
+                    print(username);
                     print(_Amount);
                     print(_password);
                   },
-                )
+                ),
               ],
             ),
           ),

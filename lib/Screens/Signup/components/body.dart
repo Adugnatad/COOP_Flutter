@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/Login/login_screen.dart';
-import 'package:flutter_auth/Screens/Signup/components/background.dart';
-import 'package:flutter_auth/Screens/Transfer/balanceScreen.dart';
+import 'package:flutter_auth/Screens/background.dart';
 import 'package:flutter_auth/components/already_have_an_account_acheck.dart';
 import 'package:flutter_auth/components/rounded_button.dart';
 import 'package:flutter_auth/components/rounded_input_field.dart';
@@ -17,6 +16,10 @@ class Body extends StatelessWidget {
   bool validate = true;
   Random rand = Random();
 
+  void onChanged(value) {
+    password = value;
+  }
+
   final credentials_dao = CredentialDao();
 
   @override
@@ -24,17 +27,21 @@ class Body extends StatelessWidget {
     Size size = MediaQuery.of(context).size;
     Firebase.initializeApp();
     return Background(
+      Colo: Color.fromRGBO(0, 173, 239, .3),
       child: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
               "SIGNUP",
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  color: Color.fromRGBO(0, 173, 239, 1),
+                  fontWeight: FontWeight.bold),
             ),
             SizedBox(height: size.height * 0.03),
             SvgPicture.asset(
               "assets/icons/signup.svg",
+              color: Color.fromRGBO(0, 173, 239, 1),
               height: size.height * 0.35,
             ),
             RoundedInputField(
@@ -44,11 +51,7 @@ class Body extends StatelessWidget {
                 username = value;
               },
             ),
-            RoundedPasswordField(
-              onChanged: (value) {
-                password = value;
-              },
-            ),
+            RoundedPasswordField(onChanged),
             RoundedButton(
               text: "SIGNUP",
               press: () {
@@ -64,7 +67,7 @@ class Body extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) {
-                      return BalanceScreen();
+                      return LoginScreen();
                     },
                   ),
                 );

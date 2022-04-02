@@ -28,7 +28,7 @@ class RoundedInputField extends StatelessWidget {
         decoration: InputDecoration(
           icon: Icon(
             icon,
-            color: kPrimaryColor,
+            color: Color.fromRGBO(0, 173, 239, 1),
           ),
           hintText: hintText,
           errorText: validate ? null : 'Username Can\'t Be Empty',
