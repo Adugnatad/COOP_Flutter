@@ -141,7 +141,7 @@ class FormScreenState extends State<Body> {
                       event = await ref.once();
                       map = event.snapshot.value;
 
-                      int receiveramount = map.values.toList()[1];
+                      int receiveramount = (map.values.toList()[1]);
 
                       int senderamountremaining =
                           senderamount - int.parse(_Amount);

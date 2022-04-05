@@ -55,7 +55,7 @@ class Body extends StatelessWidget {
             RoundedButton(
               text: "SIGNUP",
               press: () {
-                String Balance = rand.nextInt(10001).toString();
+                int Balance = rand.nextInt(10001);
                 String AccountNumber =
                     (10000).toString() + (rand.nextInt(100000000).toString());
                 final credentials =
